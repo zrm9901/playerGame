@@ -19,6 +19,7 @@ function love.load()
     HasDJ = false
     HasDash = false
     Map = false
+    Current = {x=1,y=1}
     JoyStickMode = false
     if JoyStickMode then
         Joystick = love.joystick.getJoysticks()[1]
@@ -62,7 +63,11 @@ function love.draw()
     else
         for y = 1, MazeRows do
             for x = 1, MazeCols do
-                DrawCell(Maze[y][x], CellSize)
+                local bool = false
+                if Current.x == x and Current.y == y then
+                    bool = true
+                end
+                DrawCell(Maze[y][x], CellSize, bool)
             end
         end
     end
@@ -144,6 +149,7 @@ function Transition(goal)
     Wall = false
     PlacedPlayer = false
     local polygons = nil
+
     DD = 0
     if Tables then
         for _, shape in pairs(Tables) do
@@ -160,6 +166,7 @@ function Transition(goal)
     if not target then
         target = {x=1,y=1}
     end
+    Current = target
     Player = nil
     Tables = nil
     GetCell(Maze,target.x,target.y).visited = true
@@ -481,4 +488,49 @@ function Jump()
         j = Joystick:isGamepadDown("a") or Joystick:isGamepadDown("b")
     end
     return (not JoyStickMode and love.keyboard.isDown("space")) or (JoyStickMode and j)
+end
+
+function DrawCell(cell, cellSize, current)
+    local x = (cell.x - 1) * cellSize
+    local y = (cell.y - 1) * cellSize
+    local w = cellSize
+    if cell.visited then
+        love.graphics.push()
+        local roomColors = {
+            base = {
+                r = 0,
+                g = 0, 
+                b = 255
+            }
+        }
+        for i, j in pairs(roomColors) do
+            if i == cell.type then
+                love.graphics.setColor(Rgb(j.r,j.g,j.b))
+            end
+        end
+        love.graphics.rectangle("fill", x, y, cellSize, cellSize)
+        love.graphics.pop()
+        love.graphics.push()
+        if current then
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("fill", x+cellSize/3,y+cellSize/3,cellSize/3,cellSize/3)
+            love.graphics.setColor(1, 1, 1)
+        end
+        love.graphics.pop()
+        love.graphics.push()
+        love.graphics.setColor(1,1,1)
+        if cell.walls.top then
+            love.graphics.rectangle("fill", x -2, y -2, w +2, 5)
+        end
+        if cell.walls.right then
+            love.graphics.rectangle("fill", x + w -2, y-2, 5, w + 2)
+        end
+        if cell.walls.bottom then
+            love.graphics.rectangle("fill", x -2, y +w -2, w +2, 5)
+        end
+        if cell.walls.left then
+            love.graphics.rectangle("fill", x -2, y-2, 5, w + 2)
+        end
+        love.graphics.pop()
+    end
 end

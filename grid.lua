@@ -92,42 +92,7 @@ local function generateMaze()
 end
 
 -- Draw cells
-function DrawCell(cell, cellSize)
-    local x = (cell.x - 1) * cellSize
-    local y = (cell.y - 1) * cellSize
-    local w = cellSize
-    if cell.visited then
-        love.graphics.push()
-        local roomColors = {
-            base = {
-                r = 0,
-                g = 0, 
-                b = 255
-            }
-        }
-        for i, j in pairs(roomColors) do
-            if i == cell.type then
-                love.graphics.setColor(Rgb(j.r,j.g,j.b))
-            end
-        end
-        love.graphics.rectangle("fill", x, y, cellSize, cellSize)
-        love.graphics.pop()
-        love.graphics.setColor(1, 1, 1)
-        if cell.walls.top then
-            love.graphics.rectangle("fill", x -2, y -2, w +2, 5)
-        end
-        if cell.walls.right then
-            love.graphics.rectangle("fill", x + w -2, y-2, 5, w + 2)
-        end
-        if cell.walls.bottom then
-            love.graphics.rectangle("fill", x -2, y +w -2, w +2, 5)
-        end
-        if cell.walls.left then
-            love.graphics.rectangle("fill", x -2, y-2, 5, w + 2)
-        end
-    end
-    
-end
+
 
 function InitMaze(numcolumns, numrows, numloops)
     cols, rows, loops = numcolumns, numrows, numloops
